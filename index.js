@@ -12,103 +12,89 @@ class VideoPlayer {
     this.$duration = select('.player__duration-total', player);
     this.$timelineBar = select('.player__timeline-bar', player);
 
-    this.togglePlay = this.togglePlay.bind(this);
-    this.toggleMiniPlayer = this.toggleMiniPlayer.bind(this);
-    this.toggleTheaterMode = this.toggleTheaterMode.bind(this);
-    this.toggleFullscreen = this.toggleFullscreen.bind(this);
-    this.toggleMute = this.toggleMute.bind(this);
-    this.formatDuration = this.formatDuration.bind(this);
-    this.skipVideo = this.skipVideo.bind(this);
-
-    this.state = {
-      volumeLevel: "high"
-    }
+    this.volumeLevel = "high";
 
     this.addEventListeners();
   }
 
   addEventListeners() {
-    document.addEventListener('keydown', (ev) => {
-      switch (ev.key.toLowerCase()) {
-        case ' ':
-        case 'k':
-          this.togglePlay();
-          break;
-        case 'f':
-          this.toggleFullscreen();
-          break;
-        case 't':
-          this.toggleTheaterMode();
-          break;
-        case 'i':
-          this.toggleMiniPlayer();
-          break;
-        case 'm':
-          this.toggleMute();
-          break;
-        case 'arrowleft':
-        case 'j':
-          this.skipVideo(-5);
-          break;
-        case 'arrowright':
-        case 'l':
-          this.skipVideo(5);
-          break;
-      }
-    });
+    document.addEventListener('keydown', (ev) => this.handleKeyDown(ev));
 
-    this.$playPauseBtn.addEventListener('click', this.togglePlay);
-    this.$video.addEventListener('click', this.togglePlay);
+    this.$playPauseBtn.addEventListener('click', () => this.togglePlay());
+    this.$video.addEventListener('click', () => this.togglePlay());
+
     this.$video.addEventListener('play', () => {
       this.$player.classList.remove("paused");
     });
+
     this.$video.addEventListener('pause', () => {
       this.$player.classList.add("paused");
     });
 
-    this.$theaterBtn.addEventListener('click', this.toggleTheaterMode);
-    this.$miniPlayerBtn.addEventListener('click', this.toggleMiniPlayer);
-    this.$fullscreenBtn.addEventListener('click', this.toggleFullscreen);
+    this.$theaterBtn.addEventListener('click', () => this.toggleTheaterMode());
+    this.$miniPlayerBtn.addEventListener('click', () => this.toggleMiniPlayer());
+    this.$fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
 
     document.addEventListener("fullscreenchange", () => {
       this.$player.classList.toggle("full-screen", document.fullscreenElement);
     });
+
     this.$video.addEventListener("enterpictureinpicture", () => {
       this.$player.classList.add(".mini-player");
     });
+
     this.$video.addEventListener("leavepictureinpicture", () => {
       this.$player.classList.remove(".mini-player");
     });
 
-    this.$muteBtn.addEventListener("click", this.toggleMute);
+    this.$muteBtn.addEventListener("click", () => this.toggleMute());
+
     this.$volumeAdjust.addEventListener("input", event => {
       this.$video.volume = event.target.value;
       this.$video.muted = event.target.value === 0;
     });
-    this.$video.addEventListener("volumechange", () => {
-      this.$volumeAdjust.value = this.$video.volume;
-      if (this.$video.muted || this.$video.volume === 0) {
-        this.$volumeAdjust.value = 0;
-        this.state = { ...this.state, volumeLevel: "muted" };
-      }
-      else if (this.$video.volume >= 0.5) {
-        this.state = { ...this.state, volumeLevel: "high" };
-      }
-      else {
-        this.state = { ...this.state, volumeLevel: "low" };
-      }
-      this.$player.dataset.volumeLevel = this.state.volumeLevel;
-    });
+
+    this.$video.addEventListener("volumechange", () => this.adjustVolume());
 
     this.$video.addEventListener("loadeddata", () => {
       this.$duration.textContent = this.formatDuration(this.$video.duration);
     });
+
     this.$video.addEventListener("timeupdate", () => {
       this.$currentTime.textContent = this.formatDuration(this.$video.currentTime);
       const timeSpent = this.$video.currentTime / this.$video.duration;
       this.$timelineBar.style.setProperty('--progress-position', timeSpent)
 
     });
+  }
+
+  handleKeyDown(ev) {
+    switch (ev.key.toLowerCase()) {
+      case ' ':
+      case 'k':
+        this.togglePlay();
+        break;
+      case 'f':
+        this.toggleFullscreen();
+        break;
+      case 't':
+        this.toggleTheaterMode();
+        break;
+      case 'i':
+        this.toggleMiniPlayer();
+        break;
+      case 'm':
+        this.toggleMute();
+        break;
+      case 'arrowleft':
+      case 'j':
+        this.skipVideo(-5);
+        break;
+      case 'arrowright':
+      case 'l':
+        this.skipVideo(5);
+        break;
+    }
   }
 
   togglePlay() {
@@ -142,6 +128,21 @@ class VideoPlayer {
 
   toggleMute() {
     this.$video.muted = !this.$video.muted;
+  }
+
+  adjustVolume() {
+    this.$volumeAdjust.value = this.$video.volume;
+    if (this.$video.muted || this.$video.volume === 0) {
+      this.$volumeAdjust.value = 0;
+      this.volumeLevel = "muted";
+    }
+    else if (this.$video.volume >= 0.5) {
+      this.volumeLevel = "high";
+    }
+    else {
+      this.volumeLevel = "low";
+    }
+    this.$player.dataset.volumeLevel = this.volumeLevel;
   }
 
   formatDuration(time) {
