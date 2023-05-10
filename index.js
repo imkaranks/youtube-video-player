@@ -10,6 +10,7 @@ class VideoPlayer {
     this.$volumeAdjust = select('.volume-slider', player);
     this.$currentTime = select('.player__duration-current', player);
     this.$duration = select('.player__duration-total', player);
+    this.$timelineBar = select('.player__timeline-bar', player);
 
     this.togglePlay = this.togglePlay.bind(this);
     this.toggleMiniPlayer = this.toggleMiniPlayer.bind(this);
@@ -104,6 +105,9 @@ class VideoPlayer {
     });
     this.$video.addEventListener("timeupdate", () => {
       this.$currentTime.textContent = this.formatDuration(this.$video.currentTime);
+      const timeSpent = this.$video.currentTime / this.$video.duration;
+      this.$timelineBar.style.setProperty('--progress-position', timeSpent)
+
     });
   }
 
