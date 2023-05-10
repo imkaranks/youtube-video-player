@@ -4,6 +4,7 @@
   box-sizing: border-box;
 }
 body {
+  margin: 0;
   min-height: 100vh;
   min-height: 100svh;
   font-family: sans-serif;
@@ -22,7 +23,8 @@ video {
   height:1px;
   overflow:hidden;
 }
-.container {
+/* .container { */
+.player {
   position: relative;
   width: 90%;
   max-width: 1000px;
@@ -36,6 +38,7 @@ video {
   --max-h: 90vh;
   max-width: unset;
   width: 100%;
+  max-height: var(--max-h);
 }
 .player.full-screen {
   --max-h: 100vh;
@@ -108,9 +111,9 @@ video {
 .mute-icon {
   display: none;
 }
-.player.high .volume-up-icon { display: block; }
-.player.low .volume-down-icon { display: block; }
-.player.muted .mute-icon { display: block; }
+.player[data-volume-level="high"] .volume-up-icon { display: block; }
+.player[data-volume-level="low"] .volume-down-icon { display: block; }
+.player[data-volume-level="muted"] .mute-icon { display: block; }
 
 .player__control-volume {
   display: flex;
