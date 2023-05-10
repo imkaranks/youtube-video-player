@@ -41,10 +41,12 @@ class VideoPlayer {
 
     this.$video.addEventListener("enterpictureinpicture", () => {
       this.$player.classList.add(".mini-player");
+      this.$miniPlayerBtn.firstElementChild.textContent = 'Exit Miniplayer';
     });
 
     this.$video.addEventListener("leavepictureinpicture", () => {
       this.$player.classList.remove(".mini-player");
+      this.$miniPlayerBtn.firstElementChild.textContent = 'Enter Miniplayer';
     });
 
     this.$muteBtn.addEventListener("click", () => this.toggleMute());
@@ -98,23 +100,33 @@ class VideoPlayer {
   }
 
   togglePlay() {
-    this.$video.paused
-      ? this.$video.play()
-      : this.$video.pause()
+    if (this.$video.paused) {
+      this.$video.play();
+      this.$playPauseBtn.firstElementChild.textContent = 'Pause Video';
+    } else {
+      this.$video.pause();
+      this.$playPauseBtn.firstElementChild.textContent = 'Play Video';
+    }
   }
 
   toggleFullscreen() {
-    console.log('fullscreen');
     if (document.fullscreenElement == null) {
       this.$player.requestFullscreen();
+      this.$fullscreenBtn.firstElementChild.textContent = 'Exit Fullscreen';
     }
     else {
       document.exitFullscreen();
+      this.$fullscreenBtn.firstElementChild.textContent = 'Enter Fullscreen';
     }
   }
 
   toggleTheaterMode() {
     this.$player.classList.toggle("theater");
+    if (this.$player.classList.contains('theater')) {
+      this.$theaterBtn.firstElementChild.textContent = 'Exit Theater Mode';
+    } else {
+      this.$theaterBtn.firstElementChild.textContent = 'Enter Theater Mode';
+    }
   }
 
   toggleMiniPlayer() {
@@ -127,6 +139,11 @@ class VideoPlayer {
   }
 
   toggleMute() {
+    if (this.$video.muted) {
+      this.$muteBtn.firstElementChild.textContent = 'Mute';
+    } else {
+      this.$muteBtn.firstElementChild.textContent = 'Unmute';
+    }
     this.$video.muted = !this.$video.muted;
   }
 
@@ -143,6 +160,7 @@ class VideoPlayer {
       this.volumeLevel = "low";
     }
     this.$player.dataset.volumeLevel = this.volumeLevel;
+    this.$muteBtn.firstElementChild.textContent = `volume ${this.volumeLevel}`;
   }
 
   formatDuration(time) {
